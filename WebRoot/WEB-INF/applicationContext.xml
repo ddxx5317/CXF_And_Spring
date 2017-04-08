@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://cxf.apache.org/jaxws
+           http://cxf.apache.org/schemas/jaxws.xsd">
+           
+   <import resource="classpath:META-INF/cxf/cxf.xml"/>
+   <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+   <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+     
+   <bean id="userServiceImpl" class="com.cxf.ws.service.impl.UserServiceImpl"/>
+  
+  <!-- implementor指定webservice的服务提供者，支持两种形式
+   A.直接给定服务器提供者的类名
+   B.设置为容器中的一个bean
+   -->
+<!--   <jaxws:endpoint
+    implementor="com.ws.cxf.impl.HelloWordImpl"
+    address="/getCatsByUser"
+  ></jaxws:endpoint> -->
+  
+  <!--  p:userService中的 userService为 HelloWordImpl的属性-->
+   <!-- 第一种方法 -->
+   <bean id="helloWordImpl" class="com.ws.cxf.impl.HelloWordImpl"
+   p:userService-ref="userServiceImpl"/> 
+   <!-- 第二种方法 -->
+   <!-- <bean id="helloWordImpl" class="com.ws.cxf.impl.HelloWordImpl">
+      <property name="userService" ref="userServiceImpl"/>
+   </bean> -->
+  <jaxws:endpoint implementor="#helloWordImpl" address="/getCatsByUser">
+    <jaxws:inInterceptors>
+       <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+       <bean class="com.cxf.ws.interceptor.AuthInterceptor"/>
+    </jaxws:inInterceptors>
+    
+     <jaxws:outInterceptors>
+       <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+       <bean class="com.cxf.ws.interceptor.AuthInterceptor"/>
+    </jaxws:outInterceptors>
+  </jaxws:endpoint>
+</beans>
